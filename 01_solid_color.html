@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>01 - Solid Color Shader</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            font-family: monospace;
+            background: rgba(0,0,0,0.5);
+            padding: 10px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <h2>01 - Solid Color Shader</h2>
+        <p>A basic fragment shader returning a single color.</p>
+    </div>
+    <!-- Import Three.js from a CDN -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+            }
+        }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+
+        // --- 1. Setup Scene, Camera, and Renderer ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1); // 2D Camera
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // --- 2. Create Geometry ---
+        // A simple flat plane that covers the screen
+        const geometry = new THREE.PlaneGeometry(2, 2);
+
+        // --- 3. Create Shader Material ---
+        // This is where the magic happens. We define our own shaders.
+        const material = new THREE.ShaderMaterial({
+            // Vertex Shader: Runs for every vertex (corner) of the plane.
+            // For a simple 2D plane, we just pass the position through.
+            vertexShader: `
+                void main() {
+                    gl_Position = vec4(position, 1.0);
+                }
+            `,
+            // Fragment Shader: Runs for every pixel (fragment) on the plane.
+            // This is where we decide the color.
+            fragmentShader: `
+                void main() {
+                    // gl_FragColor is a built-in variable where we set the pixel color.
+                    // It takes a vec4(Red, Green, Blue, Alpha).
+                    // Here we set it to solid Red.
+                    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+                }
+            `
+        });
+
+        // --- 4. Create Mesh and Add to Scene ---
+        const plane = new THREE.Mesh(geometry, material);
+        scene.add(plane);
+
+        // --- 5. Render Loop ---
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
